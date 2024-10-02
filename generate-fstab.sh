@@ -13,8 +13,8 @@ percentage=$(yq e '.fstab[2] | .root-reserve' $YAML_FILE) # get the percentage t
 tune2fs -m ${percentage%\%} /dev/sdb1 
 
 # Generate the fstab line
-yq e '.fstab[] | select(.type != "nfs") | .device + " " + .mount + " " + .type' $YAML_FILE | tee -a fstab
-yq e '.fstab[] | select(.type == "nfs") | .device + ":" + .export + " " + .mount + " " + .type  + " " + .options[0] + "," + .options[1]' $YAML_FILE | tee -a fstab | sed 's/,\s*$//'
+yq e '.fstab[] | select(.type != "nfs") | .device + " " + .mount + " " + .type' $YAML_FILE | tee -a /etc/fstab
+yq e '.fstab[] | select(.type == "nfs") | .device + ":" + .export + " " + .mount + " " + .type  + " " + .options[0] + "," + .options[1]' $YAML_FILE | tee -a /etc/fstab | sed 's/,\s*$//'
 
 
 
