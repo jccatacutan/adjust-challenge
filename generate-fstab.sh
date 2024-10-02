@@ -1,16 +1,17 @@
 #!/bin/bash
 
-# Variables
+# Filename
 YAML_FILE='mount-points.yaml'
 
-# Backup the current /etc/fstabfile
+# Backup the current /etc/fstab file
 cp /etc/fstab /etc/fstab.bak-$(date +%Y-%m-%d)
 
-  # Generate the fstab line
-yq e '.fstab[] | select(.type != "nfs") | .device + " " + .mount + " " + .type' mount-points.yml | tee -a fstab
-yq e '.fstab[] | select(.type == "nfs") | .device + ":" + .mount + " " + .export + " " + .type + " " + .options[0] + "," + .options[1]' mount-points.yml | tee -a fstab | sed 's/,\s*$//'
+# Generate the fstab line
+yq e '.fstab[] | select(.type != "nfs") | .device + " " + .mount + " " + .type' YAML_FILE | tee -a fstab
+yq e '.fstab[] | select(.type == "nfs") | .device + ":" + .mount + " " + .export + " " + .type + " " + .options[0] + "," + .options[1]' YAML_FILE | tee -a fstab | sed 's/,\s*$//'
 
 # Increase root reserve size
-percentage=$(yq e '.fstab[] | select(.root-reserve == "*")' $YAML_FILE) # get the percentage to be increased in the yaml file
+percentage=$(yq e '.fstab[2] | .root-reserve' $YAML_FILE) # get the percentage to be increased in the yaml file
 
-tune2fs -m ${percentage%\%} /dev/sdb1 # Increase the size command
+# Increase the size command
+tune2fs -m ${percentage%\%} /dev/sdb1 
